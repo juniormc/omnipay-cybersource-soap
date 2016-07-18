@@ -12,6 +12,14 @@ use SoapFault;
 use Omnipay\Cybersource\BankAccount;
 use Omnipay\Cybersource;
 
+
+use Auth;
+use Session;
+use Cache;
+use stdClass;
+use App\Producto;
+use App\Libraries\Utils\Carretilla;
+
 /**
  * Authorize.Net Abstract Request
  */
@@ -424,6 +432,24 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $types = $this->getCardTypes();
         $brand = $this->getCard()->getBrand();
         return empty($types[$brand]) ? null : $types[$brand];
+    }
+
+    public function getCustomerID()
+    {
+        $user = Auth::user();
+        return $user->id;
+    }
+
+    public function getIPAddress()
+    {
+        return $_SERVER['REMOTE_ADDR'];
+    }
+
+    public function getSessionId()
+    {
+        $user = Auth::user();
+        $keyFingerPrint = $user->id . "deviceFingerprint";
+        return Cache::get($keyFingerPrint);
     }
 
     #endregion
